@@ -10,15 +10,34 @@ steps:
   - 'COMMIT_SHA=$COMMIT_SHA'
   - 'BRANCH_NAME=$BRANCH_NAME'
   - 'TAG_NAME=$TAG_NAME'
+  - '_GITHUB_USER=$_GITHUB_USER'
+  - '_PR_NUMBER=$_PR_NUMBER'
+  - '_HEAD_BRANCH=$_HEAD_BRANCH'
+  - '_HEAD_REPO_URL=$_HEAD_REPO_URL'
 
-#- name: "goreleaser/goreleaser:v0.134.0"
-#  entrypoint: /bin/sh
-#  args: ["releasing/cloudbuild.sh", "api", "--snapshot"]
-#  secretEnv: ['GITHUB_TOKEN']
-#secrets:
-#- kmsKeyName: projects/jregan-corp-gke-dev/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
-#  secretEnv:
-#    GITHUB_TOKEN: CiQAwfbOkSP4tJf3ZJZMjzHaRPZ2RxiQhORZ3xxlVtpoy8631uQSUACk6WMKjtkpsRkRl+uxWUVvN29M5qveyXjaDDO094/qwsSc8RiYlHYt7Ii1bWkkz3P1kG0nHfG7Fd46A+GJ6R5NhmNfingd/nu9iKrNwLXK
+- name: "goreleaser/goreleaser:v0.138.0"
+  entrypoint: /bin/sh
+  args: ["releasing/cloudbuild.sh", "jeff", "--snapshot"]
+  secretEnv: ['GITHUB_TOKEN']
+
+
+secrets:
+- kmsKeyName: projects/lyrical-gantry-618/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
+  secretEnv:
+    GITHUB_TOKEN: CiQA2iACN7mMsSYG+jqxUiZyZc5OKJy4iybEVCPZS+bFAYOjyaESUQCRivMAyxoowmb9mWId8BD9XHG2K9he1UAFBgQXNnTIOMZChZZEhXzVDyB7fOOSDYuaHxB5TnNm97euwjVUFxP977jWqXoct6m3ocAf5VBEAQ==
+
+# secrets:
+# - kmsKeyName: projects/jregan-corp-gke-dev/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
+#   secretEnv:
+#     GITHUB_TOKEN: CiQAwfbOkSP4tJf3ZJZMjzHaRPZ2RxiQhORZ3xxlVtpoy8631uQSUACk6WMKjtkpsRkRl+uxWUVvN29M5qveyXjaDDO094/qwsSc8RiYlHYt7Ii1bWkkz3P1kG0nHfG7Fd46A+GJ6R5NhmNfingd/nu9iKrNwLXK
+#
+#
+
+# secrets:
+# - kmsKeyName: projects/lyrical-gantry-618/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
+#   secretEnv:
+#     GITHUB_TOKEN: CiQA2iACN7mMsSYG+jqxUiZyZc5OKJy4iybEVCPZS+bFAYOjyaESUQCRivMAyxoowmb9mWId8BD9XHG2K9he1UAFBgQXNnTIOMZChZZEhXzVDyB7fOOSDYuaHxB5TnNm97euwjVUFxP977jWqXoct6m3ocAf5VBEAQ==
+
 
 
 # - name: 'gcr.io/cloud-builders/docker'

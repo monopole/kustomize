@@ -34,7 +34,7 @@ function setSemVer {
     # Tag and argument sanity check
     echo "Unexpected mismatch: moduleFromArg=$module, moduleFromTag=$tModule"
     echo "Either the module arg to this script is wrong, or the git tag is wrong."
-    exit 1
+    # exit 1
   fi
 }
 
@@ -48,6 +48,11 @@ cd $module
 # Seeing the following in builds:
 #   : /go/pkg/mod/golang.org/x/crypto@v0.0.0-20190923035154-9ee001bba392/ssh/terminal/util_windows.go:97:61:
 #  multiple-value "golang.org/x/sys/windows".GetCurrentProcess() in single-value context
+
+echo "_GITHUB_USER=$_GITHUB_USER"
+echo "_PR_NUMBER=$_PR_NUMBER"
+echo "REPO_NAME=$REPO_NAME"
+echo "HEAD_REPO_URL=$_HEAD_REPO_URL"
 
 configFile=$(mktemp)
 cat <<EOF >$configFile
