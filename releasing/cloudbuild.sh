@@ -115,6 +115,8 @@ echo "## ls / #################################"
 ls /
 echo "### ls /bin ################################"
 ls /bin
+echo "### ls . ################################"
+ls .
 echo "###################################"
 
 /bin/goreleaser release --config=$configFile --rm-dist --skip-validate $@
