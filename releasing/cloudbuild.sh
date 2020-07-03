@@ -44,6 +44,10 @@ if [ "$module" == "jeff" ]; then
   module=api
 fi
 
+# CD into the module direcory.
+# Since that's where the main.go is, there's no need for
+# the `main`less is needed
+# in the `build` stanza below.
 cd $module
 
 # 2020/May/11 Windows build temporaraily removed
@@ -57,28 +61,15 @@ echo "_GITHUB_USER=$_GITHUB_USER"
 echo "_PR_NUMBER=$_PR_NUMBER"
 echo "REPO_NAME=$REPO_NAME"
 echo "HEAD_REPO_URL=$_HEAD_REPO_URL"
+echo "TAG_NAME=$TAG_NAME"
 
 configFile=$(mktemp)
 cat <<EOF >$configFile
 project_name: $module
-env:
-- CGO_ENABLED=0
-- GO111MODULE=on
-checksum:
-  name_template: 'checksums.txt'
-changelog:
-  sort: asc
-  filters:
-    exclude:
-    - '^docs:'
-    - '^test:'
-    - Merge pull request
-    - Merge branch
-release:
-  github:
-    owner: kubernetes-sigs
-    name: kustomize
-  draft: true
+
+archives:
+- name_template: "${module}_${semVer}_{{ .Os }}_{{ .Arch }}"
+
 builds:
 - ldflags: >
     -s
@@ -90,10 +81,32 @@ builds:
   - linux
   - darwin
   - windows
+
   goarch:
   - amd64
-archives:
--  name_template: "${module}_${semVer}_{{ .Os }}_{{ .Arch }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+    - Merge pull request
+    - Merge branch
+
+checksum:
+  name_template: 'checksums.txt'
+
+env:
+- CGO_ENABLED=0
+- GO111MODULE=on
+
+release:
+  github:
+    owner: kubernetes-sigs
+    name: kustomize
+  draft: true
+
 EOF
 
 cat $configFile
