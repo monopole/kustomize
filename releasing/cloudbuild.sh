@@ -40,6 +40,10 @@ function setSemVer {
 
 setSemVer
 
+if [ "$module" == "jeff" ]; then
+  module=api
+fi
+
 cd $module
 
 # 2020/May/11 Windows build temporaraily removed

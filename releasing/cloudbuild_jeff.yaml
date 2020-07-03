@@ -10,10 +10,6 @@ steps:
   - 'COMMIT_SHA=$COMMIT_SHA'
   - 'BRANCH_NAME=$BRANCH_NAME'
   - 'TAG_NAME=$TAG_NAME'
-  - '_GITHUB_USER=$_GITHUB_USER'
-  - '_PR_NUMBER=$_PR_NUMBER'
-  - '_HEAD_BRANCH=$_HEAD_BRANCH'
-  - '_HEAD_REPO_URL=$_HEAD_REPO_URL'
 
 - name: "goreleaser/goreleaser:v0.138.0"
   entrypoint: /bin/sh
