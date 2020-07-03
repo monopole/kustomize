@@ -1,0 +1,27 @@
+steps:
+- name: 'bash'
+  args:
+  - 'echo'
+  - 'Cloud build substitution check: '
+  - 'BUILD_ID=$BUILD_ID'
+  - 'PROJECT_ID=$PROJECT_ID'
+  - 'REVISION_ID=$REVISION_ID'
+  - 'REPO_NAME=$REPO_NAME'
+  - 'COMMIT_SHA=$COMMIT_SHA'
+  - 'BRANCH_NAME=$BRANCH_NAME'
+  - 'TAG_NAME=$TAG_NAME'
+
+#- name: "goreleaser/goreleaser:v0.134.0"
+#  entrypoint: /bin/sh
+#  args: ["releasing/cloudbuild.sh", "api", "--snapshot"]
+#  secretEnv: ['GITHUB_TOKEN']
+#secrets:
+#- kmsKeyName: projects/jregan-corp-gke-dev/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
+#  secretEnv:
+#    GITHUB_TOKEN: CiQAwfbOkSP4tJf3ZJZMjzHaRPZ2RxiQhORZ3xxlVtpoy8631uQSUACk6WMKjtkpsRkRl+uxWUVvN29M5qveyXjaDDO094/qwsSc8RiYlHYt7Ii1bWkkz3P1kG0nHfG7Fd46A+GJ6R5NhmNfingd/nu9iKrNwLXK
+
+
+# - name: 'gcr.io/cloud-builders/docker'
+
+#- name: 'ubuntu'
+#  args: ['bash', 'releasing/echo.sh']
