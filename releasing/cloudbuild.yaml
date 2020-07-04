@@ -9,8 +9,7 @@ steps:
   - 'REPO_NAME=$REPO_NAME'
   - 'COMMIT_SHA=$COMMIT_SHA'
   - 'BRANCH_NAME=$BRANCH_NAME'
-  - 'GITHUB_USER=$GITHUB_USER'
-  - 'uGITHUB_USER=$_GITHUB_USER'
+  - '_GITHUB_USER=$_GITHUB_USER'
   - 'TAG_NAME=$TAG_NAME'
 
 # Cloud build has already copied the repo at the tag that
