@@ -22,9 +22,9 @@ steps:
 # So clone the repo to /workspace/kustomize
 - name: gcr.io/cloud-builders/git
   args:
-	- clone
-	- https://github.com/monopole/kustomize.git
-	- myClone
+  - clone
+  - https://github.com/monopole/kustomize.git
+  - myClone
 
 # Checkout the proper tag.
 - name: gcr.io/cloud-builders/git
