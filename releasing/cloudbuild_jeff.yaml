@@ -11,12 +11,21 @@ steps:
   - 'BRANCH_NAME=$BRANCH_NAME'
   - 'TAG_NAME=$TAG_NAME'
 
+# Cloud build has already copied the repo at a particular tag,
+# but hasn't actually cloned it (there's no .git directory).
+# To allow goreleasers to make full release notes, we need
+# all the commit names.
+# Hence the need for git, hence the need for a new workspace?
+
 # - name: "gcr.io/cloud-builders/git"
 #   args: [fetch, --tags, --depth=100]
 
+#
 - name: 'goreleaser/goreleaser:v0.138.0'
   entrypoint: /bin/sh
-  args: ['releasing/cloudbuild.sh', 'jeff', '$TAG_NAME', '--snapshot']
+	# The final arg here should be '--snapshot' on a local build,
+	# to suppress the release and leave the 'dist' directory in place.
+  args: ['releasing/cloudbuild.sh', 'jeff', '$TAG_NAME']
   secretEnv: ['GITHUB_TOKEN']
 
 

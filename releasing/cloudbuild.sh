@@ -38,7 +38,10 @@ fi
 semVer=`echo $fullTag | sed "s|$tModule/||"`
 echo "semVer=$semVer"
 
+# This is probably a directory called /workspace
 pwd
+
+# This should match the top of the repository
 ls
 
 if [ "$module" == "jeff" ]; then
@@ -47,8 +50,7 @@ fi
 
 # CD into the module directory.
 # Since that's where the main.go is, there's no need for
-# the `main`less is needed
-# in the `build` stanza below.
+# extra details in the `build` stanza below.
 cd $module
 
 # 2020/May/11 Windows build temporaraily removed
@@ -57,12 +59,6 @@ cd $module
 # Seeing the following in builds:
 #   : /go/pkg/mod/golang.org/x/crypto@v0.0.0-20190923035154-9ee001bba392/ssh/terminal/util_windows.go:97:61:
 #  multiple-value "golang.org/x/sys/windows".GetCurrentProcess() in single-value context
-
-echo "_GITHUB_USER=$_GITHUB_USER"
-echo "_PR_NUMBER=$_PR_NUMBER"
-echo "REPO_NAME=$REPO_NAME"
-echo "HEAD_REPO_URL=$_HEAD_REPO_URL"
-echo "TAG_NAME=$TAG_NAME"
 
 configFile=$(mktemp)
 cat <<EOF >$configFile
@@ -116,8 +112,10 @@ echo "## ls / #################################"
 ls /
 echo "### ls /bin ################################"
 ls /bin
-echo "### ls . ################################"
-ls .
+echo "### ls /usr/bin ################################"
+ls /usr/bin
+echo "### ls -las . ################################"
+ls -las .
 echo "###################################"
 
 /bin/goreleaser release --config=$configFile --rm-dist --skip-validate $remainingArgs
