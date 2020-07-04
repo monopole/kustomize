@@ -1,19 +1,28 @@
 #!/bin/bash
+#
+# Usage (from top of repo):
+#
+#  releasing/cloudbuild.sh TAG [--snapshot]
+#
+# Where TAG is in the form
+#
+#   api/v1.2.3
+#   kustomize/v1.2.3
+#   cmd/config/v1.2.3
+#   ... etc.
+#
+# Cloud build should be configured to trigger on tags
+# matching:
+#
+#   [\w/]+/v\d+\.\d+\.\d+
+#
+# This script runs goreleaser (http://goreleaser.com),
+# so the google cloud config should install the image,
+# the run this.
+
 set -e
 set -x
 
-# Shell script to run http://goreleaser.com
-# First it dynamically creates the goreleaser input file,
-# then it runs goreleaser.
-
-# This is one of kustomize, api, kyaml, cmd/config, etc.
-# It's provided by a Google cloudbuild.yaml file.
-module=$1
-shift
-echo "module=$module"
-
-# This should be the value of the tag that triggered the build.
-# It's provided by a Google cloudbuild.yaml file.
 fullTag=$1
 shift
 echo "fullTag=$fullTag"
@@ -23,34 +32,32 @@ echo "Remaining args:  $remainingArgs"
 
 # Take everything before the last slash.
 # This is expected to match $module.
-tModule=${fullTag%/*}
-echo "tModule=$tModule"
-
-if [ "$module" != "$tModule" ]; then
-  # Tag and argument sanity check
-  echo "Unexpected mismatch: module from arg = '$module', module from tag = '$tModule"
-  echo "Either the module arg to this script is wrong, or the git tag is wrong."
-  # exit 1
-fi
+module=${fullTag%/*}
+echo "module=$module"
 
 # Take everything after the last slash.
 # This should be something like "v1.2.3".
-semVer=`echo $fullTag | sed "s|$tModule/||"`
+semVer=`echo $fullTag | sed "s|$module/||"`
 echo "semVer=$semVer"
 
 # This is probably a directory called /workspace
 pwd
 
-# This should match the top of the repository
-ls
+# These files should look like the top of the repository
+echo "### ls -las . ################################"
+ls -las .
+echo "## ls / #################################"
+ls /
+echo "### ls /bin ################################"
+ls /bin
+echo "### ls /usr/bin ################################"
+ls /usr/bin
+echo "###################################"
 
-if [ "$module" == "jeff" ]; then
-  module=api
-fi
 
 # CD into the module directory.
-# Since that's where the main.go is, there's no need for
-# extra details in the `build` stanza below.
+# This directory expected to contain a main.go, so there's
+# no need for extra details in the `build` stanza below.
 cd $module
 
 # 2020/May/11 Windows build temporaraily removed
@@ -107,15 +114,5 @@ release:
 EOF
 
 cat $configFile
-
-echo "## ls / #################################"
-ls /
-echo "### ls /bin ################################"
-ls /bin
-echo "### ls /usr/bin ################################"
-ls /usr/bin
-echo "### ls -las . ################################"
-ls -las .
-echo "###################################"
 
 /bin/goreleaser release --config=$configFile --rm-dist --skip-validate $remainingArgs

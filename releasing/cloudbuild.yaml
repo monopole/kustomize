@@ -12,22 +12,28 @@ steps:
   - 'TAG_NAME=$TAG_NAME'
 
 # Cloud build has already copied the repo at a particular tag,
-# but hasn't actually cloned it (there's no .git directory).
-# To allow goreleasers to make full release notes, we need
-# all the commit names.
-# Hence the need for git, hence the need for a new workspace?
+# but hasn't actually cloned it; there's no .git directory.
+# goreleaser, however, needs the repo and its history to produce
+# release notes. Hence the need for git, hence the need for a new workspace?
 
-# - name: "gcr.io/cloud-builders/git"
-#   args: [fetch, --tags, --depth=100]
+- name: "gcr.io/cloud-builders/git"
+  args: [fetch, --tags, --depth=100]
 
-#
+#- name: 'gcr.io/cloud-builders/git'
+#  args: ['clone', 'https://github.com/GoogleCloudPlatform/cloud-builders']
+
 - name: 'goreleaser/goreleaser:v0.138.0'
   entrypoint: /bin/sh
   # The final arg here should be '--snapshot' on a local build,
   # to suppress the release and leave the 'dist' directory in place.
-  args: ['releasing/cloudbuild.sh', 'jeff', '$TAG_NAME']
+  args: ['releasing/cloudbuild.sh', '$TAG_NAME']
   secretEnv: ['GITHUB_TOKEN']
 
+# golreleaser expects the GITHUB_TOKEN env var to hold the github token
+# it needs to write the released package and notes back to github.
+# The raw token was encrypted by gcloud kms (Key Management Service)
+# The base64 of that is shown below.  It get decrypted by cloud build
+# and provided back to goreleaser.
 
 secrets:
 - kmsKeyName: projects/lyrical-gantry-618/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
