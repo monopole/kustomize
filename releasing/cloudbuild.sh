@@ -6,56 +6,40 @@ set -x
 # First it dynamically creates the goreleaser input file,
 # then it runs goreleaser.
 
-# This is one of kustomize, api, kyaml, etc.
+# This is one of kustomize, api, kyaml, cmd/config, etc.
+# It's provided by a Google cloudbuild.yaml file.
 module=$1
 shift
+echo "module=$module"
 
+# This should be the value of the tag that triggered the build.
+# It's provided by a Google cloudbuild.yaml file.
+fullTag=$1
+shift
+echo "fullTag=$fullTag"
 
-which git
+remainingArgs="$@"
+echo "Remaining args:  $remainingArgs"
 
-git version
+# Take everything before the last slash.
+# This is expected to match $module.
+tModule=${fullTag%/*}
+echo "tModule=$tModule"
 
-# For logging and debugging.
-git status
+if [ "$module" != "$tModule" ]; then
+  # Tag and argument sanity check
+  echo "Unexpected mismatch: module from arg = '$module', module from tag = '$tModule"
+  echo "Either the module arg to this script is wrong, or the git tag is wrong."
+  # exit 1
+fi
 
-# For logging and debugging.
-# This shows most recent tag, which is presumably
-# the tag we're releasing.  If not, there might
-# be a problem.
-git describe
+# Take everything after the last slash.
+# This should be something like "v1.2.3".
+semVer=`echo $fullTag | sed "s|$tModule/||"`
+echo "semVer=$semVer"
 
-
-# Check the tag for consistency with the given module name.
-# The following assumes git tags formatted like
-# "api/v1.2.3" or "cmd/config/v1.2.3" and splits on the last
-# slash.
-#
-# Goreleaser doesn't know what to do the first part of this
-# tag format, and fails when creating an archive
-# with a / in the name.
-function setSemVer {
-  local fullTag=$(git describe)
-  local tModule=${fullTag%/*}
-  semVer=${fullTag#*/}
-
-  # Make sure version has no slash
-  # (foo/v0.1.0 becomes v0.1.0)
-  local tmp=${semVer#*/}
-  if [ "$tmp" != "$semVer" ]; then
-    semVer="$tmp"
-  fi
-
-  echo "tModule=$tModule"
-  echo "semVer=$semVer"
-  if [ "$module" != "$tModule" ]; then
-    # Tag and argument sanity check
-    echo "Unexpected mismatch: moduleFromArg=$module, moduleFromTag=$tModule"
-    echo "Either the module arg to this script is wrong, or the git tag is wrong."
-    # exit 1
-  fi
-}
-
-setSemVer
+pwd
+ls
 
 if [ "$module" == "jeff" ]; then
   module=api
@@ -136,4 +120,4 @@ echo "### ls . ################################"
 ls .
 echo "###################################"
 
-/bin/goreleaser release --config=$configFile --rm-dist --skip-validate $@
+/bin/goreleaser release --config=$configFile --rm-dist --skip-validate $remainingArgs
