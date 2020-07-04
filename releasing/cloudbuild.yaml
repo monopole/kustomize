@@ -9,23 +9,34 @@ steps:
   - 'REPO_NAME=$REPO_NAME'
   - 'COMMIT_SHA=$COMMIT_SHA'
   - 'BRANCH_NAME=$BRANCH_NAME'
+	- '_GITHUB_USER=${_GITHUB_USER}'
+	- '_GITHUB_USER=$_GITHUB_USER'
+	- 'GITHUB_USER=$GITHUB_USER'
   - 'TAG_NAME=$TAG_NAME'
 
-# Cloud build has already copied the repo at a particular tag,
-# but hasn't actually cloned it; there's no .git directory.
-# goreleaser, however, needs the repo and its history to produce
-# release notes. Hence the need for git, hence the need for a new workspace?
+# Cloud build has already copied the repo at the tag that
+# that triggered the build to its /workspace directory, but
+# hasn't actually _cloned_ the repo (there's no .git directory).
+#
+# The goreleaser tool, however, needs the repo and its history
+# to produce release notes.
+#
+# So clone the repo to /workspace/kustomize
+- name: gcr.io/cloud-builders/git
+  args: ['clone', 'https://github.com/${_GITHUB_USER}/kustomize.git']
 
-- name: "gcr.io/cloud-builders/git"
-  args: [fetch, --tags, --depth=100]
+# Checkout the proper tag.
+- name: gcr.io/cloud-builders/git
+  dir: kustomize
+  args: ['checkout', '$TAG_NAME']
 
-#- name: 'gcr.io/cloud-builders/git'
-#  args: ['clone', 'https://github.com/GoogleCloudPlatform/cloud-builders']
-
-- name: 'goreleaser/goreleaser:v0.138.0'
+# Run gorelease, but indirectly via a shell script.
+- name: goreleaser/goreleaser:v0.138.0
   entrypoint: /bin/sh
-  # The final arg here should be '--snapshot' on a local build,
-  # to suppress the release and leave the 'dist' directory in place.
+  dir: kustomize
+  # The final arg here should be '--snapshot' on
+	# local build, to suppress the release and leave
+	# the 'dist' directory in place.
   args: ['releasing/cloudbuild.sh', '$TAG_NAME']
   secretEnv: ['GITHUB_TOKEN']
 
@@ -51,10 +62,3 @@ secrets:
 # - kmsKeyName: projects/lyrical-gantry-618/locations/global/keyRings/kust-cloud-key-ring/cryptoKeys/kust-cloud-key-name
 #   secretEnv:
 #     GITHUB_TOKEN: CiQA2iACN7mMsSYG+jqxUiZyZc5OKJy4iybEVCPZS+bFAYOjyaESUQCRivMAyxoowmb9mWId8BD9XHG2K9he1UAFBgQXNnTIOMZChZZEhXzVDyB7fOOSDYuaHxB5TnNm97euwjVUFxP977jWqXoct6m3ocAf5VBEAQ==
-
-
-
-# - name: 'gcr.io/cloud-builders/docker'
-
-#- name: 'ubuntu'
-#  args: ['bash', 'releasing/echo.sh']
