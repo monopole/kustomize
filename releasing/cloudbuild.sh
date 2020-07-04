@@ -2,27 +2,44 @@
 set -e
 set -x
 
-# Script to run http://goreleaser.com
+# Shell script to run http://goreleaser.com
+# First it dynamically creates the goreleaser input file,
+# then it runs goreleaser.
 
-# Removed from `build` stanza
-# binary: $module
-
+# This is one of kustomize, api, kyaml, etc.
 module=$1
 shift
 
+
+which git
+
+git version
+
+# For logging and debugging.
+git status
+
+# For logging and debugging.
+# This shows most recent tag, which is presumably
+# the tag we're releasing.  If not, there might
+# be a problem.
+git describe
+
+
+# Check the tag for consistency with the given module name.
+# The following assumes git tags formatted like
+# "api/v1.2.3" or "cmd/config/v1.2.3" and splits on the last
+# slash.
+#
+# Goreleaser doesn't know what to do the first part of this
+# tag format, and fails when creating an archive
+# with a / in the name.
 function setSemVer {
-  # Check the tag for consistency with module name.
-  # The following assumes git tags formatted like
-  # "api/v1.2.3" and splits on the slash.
-  # Goreleaser doesn't know what to do with this
-  # tag format, and fails when creating an archive
-  # with a / in the name.
   local fullTag=$(git describe)
   local tModule=${fullTag%/*}
   semVer=${fullTag#*/}
 
   # Make sure version has no slash
-  # (k8s/v0.1.0 becomes v0.1.0)
+  # (foo/v0.1.0 becomes v0.1.0)
   local tmp=${semVer#*/}
   if [ "$tmp" != "$semVer" ]; then
     semVer="$tmp"
@@ -44,7 +61,7 @@ if [ "$module" == "jeff" ]; then
   module=api
 fi
 
-# CD into the module direcory.
+# CD into the module directory.
 # Since that's where the main.go is, there's no need for
 # the `main`less is needed
 # in the `build` stanza below.
@@ -103,7 +120,7 @@ env:
 
 release:
   github:
-    owner: kubernetes-sigs
+    owner: monopole
     name: kustomize
   draft: true
 
