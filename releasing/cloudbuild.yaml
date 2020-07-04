@@ -34,8 +34,8 @@ steps:
   entrypoint: /bin/sh
   dir: kustomize
   # The final arg here should be '--snapshot' on
-	# local build, to suppress the release and leave
-	# the 'dist' directory in place.
+  # local build, to suppress the release and leave
+  # the 'dist' directory in place.
   args: ['releasing/cloudbuild.sh', '$TAG_NAME']
   secretEnv: ['GITHUB_TOKEN']
 
