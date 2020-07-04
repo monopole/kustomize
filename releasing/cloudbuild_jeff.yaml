@@ -23,8 +23,8 @@ steps:
 #
 - name: 'goreleaser/goreleaser:v0.138.0'
   entrypoint: /bin/sh
-	# The final arg here should be '--snapshot' on a local build,
-	# to suppress the release and leave the 'dist' directory in place.
+  # The final arg here should be '--snapshot' on a local build,
+  # to suppress the release and leave the 'dist' directory in place.
   args: ['releasing/cloudbuild.sh', 'jeff', '$TAG_NAME']
   secretEnv: ['GITHUB_TOKEN']
 
