@@ -9,9 +9,15 @@ steps:
   - 'REPO_NAME=$REPO_NAME'
   - 'COMMIT_SHA=$COMMIT_SHA'
   - 'BRANCH_NAME=$BRANCH_NAME'
-	- '_GITHUB_USER=$_GITHUB_USER'
 	- 'GITHUB_USER=$GITHUB_USER'
   - 'TAG_NAME=$TAG_NAME'
+
+steps:
+- name: 'bash'
+  args:
+  - 'echo'
+  - 'Cloud build substitution check 2: '
+	- 'uGITHUB_USER=$_GITHUB_USER'
 
 # Cloud build has already copied the repo at the tag that
 # that triggered the build to its /workspace directory, but
