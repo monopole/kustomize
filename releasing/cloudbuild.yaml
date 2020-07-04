@@ -21,17 +21,17 @@ steps:
 #
 # So clone the repo to /workspace/kustomize
 - name: gcr.io/cloud-builders/git
-  args: ['clone', 'https://github.com/${_GITHUB_USER}/kustomize.git']
+  args: ['clone', 'https://github.com/${_GITHUB_USER}/kustomize.git', 'myClone']
 
 # Checkout the proper tag.
 - name: gcr.io/cloud-builders/git
-  dir: kustomize
+  dir: myClone
   args: ['checkout', '$TAG_NAME']
 
 # Run gorelease, but indirectly via a shell script.
 - name: goreleaser/goreleaser:v0.138.0
   entrypoint: /bin/sh
-  dir: kustomize
+  dir: myClone
   # The final arg here should be '--snapshot' on
   # local build, to suppress the release and leave
   # the 'dist' directory in place.
