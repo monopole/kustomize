@@ -593,6 +593,17 @@ func (m *resWrangler) ToRNodeSlice() []*kyaml.RNode {
 	return result
 }
 
+// DeAnchor replaces all YAML anchors with their actual values.
+// TODO: Make this work for anchors that cross Resource boundaries.
+func (m *resWrangler) DeAnchor() (err error) {
+	for i := range m.rList {
+		if err = m.rList[i].DeAnchor(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ApplySmPatch applies the patch, and errors on Id collisions.
 func (m *resWrangler) ApplySmPatch(
 	selectedSet *resource.IdSet, patch *resource.Resource) error {

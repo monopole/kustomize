@@ -903,6 +903,39 @@ func (rn *RNode) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// DeAnchor copies the node, inflating all YAML anchors with what they alias.
+func (rn *RNode) DeAnchor() (err error) {
+	rn.value, err = deAnchor(rn.value)
+	return
+}
+
+func deAnchor(yn *yaml.Node) (res *yaml.Node, err error) {
+	if yn == nil {
+		return nil, nil
+	}
+	yn.Anchor = ""
+	switch yn.Kind {
+	case yaml.ScalarNode :
+		return yn, nil
+	case yaml.AliasNode :
+		return deAnchor(yn.Alias)
+	case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode :
+		c := *yn
+		if len(yn.Content) > 0 {
+			c.Content = make([]*Node, len(yn.Content))
+			for i := range yn.Content {
+				c.Content[i], err = deAnchor(yn.Content[i])
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+		return &c, nil
+	default:
+		return nil, fmt.Errorf("cannot deAnchor kind %q", yn.Kind)
+	}
+}
+
 // GetValidatedMetadata returns metadata after subjecting it to some tests.
 func (rn *RNode) GetValidatedMetadata() (ResourceMeta, error) {
 	m, err := rn.GetMeta()

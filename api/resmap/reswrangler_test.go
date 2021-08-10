@@ -902,6 +902,54 @@ rules:
 	}
 }
 
+func TestDeAnchor1(t *testing.T) {
+	input := `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wildcard
+data:
+  color: &color-used blue
+  feeling: *color-used
+`
+	rm, err := rmF.NewResMapFromBytes([]byte(input))
+	assert.NoError(t, err)
+	assert.NoError(t, rm.DeAnchor())
+	yaml, err := rm.AsYaml()
+	assert.NoError(t, err)
+	assert.Equal(t, strings.TrimSpace(`
+apiVersion: v1
+data:
+  color: blue
+  feeling: blue
+kind: ConfigMap
+metadata:
+  name: wildcard
+`), strings.TrimSpace(string(yaml)))
+}
+
+// TODO: Get the read to work, and get cross-resource DeAnchor to work.
+func TestDeAnchor2(t *testing.T) {
+	input := `apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: betty
+data:
+  color: &color-used blue
+  feeling: *color-used
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bob
+data:
+  color: red
+  feeling: *color-used
+`
+	_, err := rmF.NewResMapFromBytes([]byte(input))
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unknown anchor 'color-used' referenced")
+}
+
 func TestApplySmPatch_General(t *testing.T) {
 	const (
 		myDeployment      = "Deployment"

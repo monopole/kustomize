@@ -199,6 +199,9 @@ type ResMap interface {
 	// Clear removes all resources and Ids.
 	Clear()
 
+	// DeAnchor replaces all YAML anchors with their actual values.
+  DeAnchor() error
+
 	// DropEmpties drops empty resources from the ResMap.
 	DropEmpties()
 
